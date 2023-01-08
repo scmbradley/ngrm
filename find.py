@@ -26,7 +26,7 @@ class AnagramFinder:
 
     @staticmethod
     def sanitise_word(word):
-        return re.sub(r"[a-z]", "", word.lower())
+        return re.sub(r"\W", "", word.lower())
 
     @staticmethod
     def word_in_ctr(in_word, in_ctr):
@@ -36,6 +36,15 @@ class AnagramFinder:
             return False
         return True
 
+    @staticmethod
+    def add_word_to_lists(in_word, in_list):
+        ret = SortedList()
+        for elem in in_list:
+            new_elem = SortedList([in_word] + elem)
+            if new_elem not in ret:
+                ret.add(new_elem)
+        return ret
+
     def find(self, input_string):
         sanitised_input = AnagramFinder.sanitise_word(input_string)
         ctr = NNCounter(sanitised_input)
@@ -43,14 +52,23 @@ class AnagramFinder:
         return self._find_anagrams(ctr, word_list)
 
     def _find_anagrams(self, input_ctr, word_list):
-        if input_ctr == EMPTY_COUNTER:
-            return AnagramResults.SUCCESS
-        anagrams = []
+        anagrams = SortedList()
         for word in word_list:
             new_ctr = input_ctr - NNCounter(word)
-            continuations = self._find_anagrams(new_ctr, word_list)
-            word_plus_continuations = [[word] + x for x in continuations]
-            anagrams.extend(word_plus_continuations)
+            if new_ctr == EMPTY_COUNTER:
+                if [word] not in anagrams:
+                    anagrams.add(SortedList([word]))
+            else:
+                new_wl = self._find_words(new_ctr, word_list)
+                if not new_wl:
+                    continue
+                else:
+                    partials = self._find_anagrams(new_ctr, new_wl)
+                    if partials is None:
+                        continue
+                    for a in AnagramFinder.add_word_to_lists(word, partials):
+                        if a not in anagrams:
+                            anagrams.add(a)
         return anagrams
 
     def _find_words(self, input_ctr, word_list=None):
@@ -61,3 +79,10 @@ class AnagramFinder:
             if AnagramFinder.word_in_ctr(word, input_ctr):
                 matching_words.add(word)
         return matching_words
+
+
+def team_test():
+    a = AnagramFinder("team.txt")
+    team_ctr = NNCounter("team")
+    team_wl = a._find_words(team_ctr)
+    return a._find_anagrams(team_ctr, team_wl)

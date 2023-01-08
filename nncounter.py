@@ -74,7 +74,7 @@ class NNCounter(Counter):
         """
         if not isinstance(other, NNCounter):
             return NotImplemented
-        result = Counter()
+        result = NNCounter()
         for elem, count in self.items():
             newcount = count - other[elem]
             if newcount > 0:
@@ -88,7 +88,7 @@ class NNCounter(Counter):
         return result
 
     def subtract(self, *args, **kwargs):
-        other = Counter(*args, **kwargs)
+        other = NNCounter(*args, **kwargs)
         self -= other
 
 
