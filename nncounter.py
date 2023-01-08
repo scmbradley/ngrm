@@ -29,23 +29,6 @@ class NNCounter(Counter):
         super().__init__()
         self.update(iterable, **kwds)
 
-    # def __add__(self, other):
-    #     """
-    #     Add counts from two counters.
-    #     """
-    #     if not isinstance(other, NNCounter):
-    #         return NotImplemented
-    #     result = NNCounter()
-    #     for elem, count in self.items():
-    #         newcount = count + other[elem]
-    #         if newcount > 0:
-    #             result[elem] = newcount
-    #         if newcount < 0:
-    #             raise NegativeNumberError
-    #     for elem, count in other.items():
-    #         if elem not in self and count > 0:
-    #             result[elem] = count
-    #     return result
     def __isub__(self, other):
         """
         Inplace subtract counter.
