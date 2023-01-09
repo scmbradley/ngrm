@@ -5,6 +5,7 @@ from pathlib import Path
 from enum import Enum, auto
 from sortedcontainers import SortedList
 import re
+import cProfile
 
 
 class AnagramResults(Enum):
@@ -51,6 +52,12 @@ class AnagramFinder:
         word_list = self._find_words(ctr)
         return self._find_anagrams(ctr, word_list)
 
+    def findp(self, input_string):
+        a = self.find(input_string)
+        for ngrm in a:
+            print(" ".join(ngrm))
+        print(len(a))
+
     def _find_anagrams(self, input_ctr, word_list):
         anagrams = SortedList()
         for word in word_list:
@@ -60,6 +67,10 @@ class AnagramFinder:
                     anagrams.add(SortedList([word]))
             else:
                 new_wl = self._find_words(new_ctr, word_list)
+                words_after = new_wl.bisect_right(word)
+                if words_after > 0:
+                    words_after -= 1
+                new_wl = new_wl[words_after:]
                 if not new_wl:
                     continue
                 else:
@@ -82,7 +93,10 @@ class AnagramFinder:
 
 
 def team_test():
-    a = AnagramFinder("team.txt")
-    team_ctr = NNCounter("team")
+    a = AnagramFinder("sowpods.txt")
+    team_ctr = NNCounter("britneys")
     team_wl = a._find_words(team_ctr)
     return a._find_anagrams(team_ctr, team_wl)
+
+
+cProfile.run("team_test()")
