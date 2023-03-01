@@ -73,6 +73,3 @@ class NNCounter(Counter):
     def subtract(self, *args, **kwargs):
         other = NNCounter(*args, **kwargs)
         self -= other
-
-
-# TODO: subtract

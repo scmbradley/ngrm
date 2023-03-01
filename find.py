@@ -3,7 +3,7 @@
 from nncounter import NNCounter, SubtractionError
 from pathlib import Path
 from enum import Enum, auto
-from sortedcontainers import SortedList
+from sortedcontainers import SortedList, SortedDict
 import re
 import cProfile
 
@@ -61,16 +61,16 @@ class AnagramFinder:
     def _find_anagrams(self, input_ctr, word_list):
         anagrams = SortedList()
         for word in word_list:
-            new_ctr = input_ctr - NNCounter(word)
+            new_ctr = input_ctr - word_list[word]
             if new_ctr == EMPTY_COUNTER:
                 if [word] not in anagrams:
                     anagrams.add(SortedList([word]))
             else:
                 new_wl = self._find_words(new_ctr, word_list)
-                words_after = new_wl.bisect_right(word)
-                if words_after > 0:
-                    words_after -= 1
-                new_wl = new_wl[words_after:]
+                # words_after = new_wl.bisect_right(word)
+                # if words_after > 0:
+                #     words_after -= 1
+                # new_wl = new_wl[words_after:]
                 if not new_wl:
                     continue
                 else:
@@ -84,11 +84,11 @@ class AnagramFinder:
 
     def _find_words(self, input_ctr, word_list=None):
         if word_list is None:
-            word_list = self.word_list
-        matching_words = SortedList()
+            word_list = {word: NNCounter(word) for word in self.word_list}
+        matching_words = SortedDict()
         for word in word_list:
             if AnagramFinder.word_in_ctr(word, input_ctr):
-                matching_words.add(word)
+                matching_words[word] = word_list[word]
         return matching_words
 
 
